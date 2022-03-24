@@ -1,0 +1,28 @@
+.footer {
+    display: flex;
+    position: fixed;
+    flex: 1;
+    padding: 2em;
+    bottom: 0%;
+    width: 100%;
+    justify-content: flex-end;
+    padding: 100px;
+    align-items: center;
+  }
+  
+  .footer a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+  }
+
+  .footer button {
+    /* justify-content: flex-end; */
+    align-items: center;
+    display: flex;
+    border-radius: 100px;
+    height: 50px;
+
+    /* background-image: url('/public/newPostButton.svg'); */
+  }
