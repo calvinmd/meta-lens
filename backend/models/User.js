@@ -1,24 +1,25 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-    userID: {
-        type: Number,
-        required: [true, "User ID required"]
+    userCeramicId: {
+        type: String,
+        required: [true, "Need Ceramic ID"],
+        trim: true
     },
     userWallet: {
         type: String,
         required: [true, "User wallet address missing"],
         trim: true
     },
-    userNftContractAddress: { //tokenID
+    userNftContractAddress: { //tokenID 
         type: String,
         required: [true, "NFT Contract Address missing"],
         trim: true
     },
     username: {
         type: String,
-        required: true,
-        trim: [true, "User name missing - KYC"],
+        required: [true, "User name missing - KYC"],
+        trim: true,
         default: "User"
     },
     userHandle: {

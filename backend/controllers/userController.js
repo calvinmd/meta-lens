@@ -25,7 +25,7 @@ exports.addUser = async (req, res, next) => {
             data: newUser
         });
     } catch (error) {
-        if(error.name=="ValidationError") {
+        if(error.name == "ValidationError") {
             const messages = Object.values(error.errors).map(val => val.message);
             res.status(400).json({
                 success: false,
