@@ -2,16 +2,24 @@ import Layout from '../components/Layout'
 import Nav from '../components/Nav'
 import '../styles/globals.css'
 import { AddressProvider } from '../contexts/AddressContext';
+import { ProviderProvider } from '../contexts/ProviderContext';
+import { ContractAddressProvider } from '../contexts/ContractContext'
 
 function MyApp({ Component, pageProps }) {
 
   return (
-    <AddressProvider>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </AddressProvider>
-    
+
+    <ProviderProvider>
+      <AddressProvider>
+        <ContractAddressProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </ContractAddressProvider>
+      </AddressProvider>
+    </ProviderProvider>
+
+
   )
 }
 

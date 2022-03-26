@@ -3,14 +3,18 @@
 }
 
 .main {
-  min-height: 100vh;
-  padding: 4rem 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.25 rem
+min-height: 70vh;
+    padding: 0rem 0;
+    flex: 1 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5rem;
 }
 
 .footer {
@@ -68,3 +72,36 @@
 }
 
 
+
+.container-signup{
+     margin-left: auto;
+    margin-right: auto;
+    display: flex;
+  justify-content:center;
+  align-items: center;
+  max-width: 800px;
+  margin: 25vh auto;
+ 
+
+}
+.login-form{
+    
+  border-radius: 5px;  
+  display: flex;
+  flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+     justify-content:center;
+  align-items: center;
+
+  
+}
+.input {
+    
+     border-radius: 25px;
+  margin: 10px;
+  padding: 10px 20px;
+   height: "25px" ;
+   text-align: center;
+   
+}

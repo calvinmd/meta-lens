@@ -1,10 +1,10 @@
 import footerStyles from '../styles/Footer.module.css'
 import NewPostButton from './Button/NewPostButton'
 
-const Footer = ({children}) => {
+const Footer = ({ children }) => {
   return (
     <div className={footerStyles.footer}>
-        {/* <NewPostButton /> */}
+      <NewPostButton />
     </div>
   )
 }

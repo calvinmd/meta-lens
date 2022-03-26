@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { createContext } from "react";
-import Web3 from 'web3';
 export const AddressContext = createContext("");
 
 

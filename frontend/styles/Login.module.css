@@ -1,0 +1,32 @@
+.container{
+     margin-left: auto;
+    margin-right: auto;
+    display: flex;
+  justify-content:center;
+  align-items: center;
+  max-width: 800px;
+  margin: 25vh auto;
+ 
+
+}
+.login-form{
+    
+  border-radius: 5px;  
+  display: flex;
+  flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+     justify-content:center;
+  align-items: center;
+
+  
+}
+.input {
+    
+     border-radius: 25px;
+  margin: 10px;
+  padding: 10px 20px;
+   height: "25px" ;
+   text-align: center;
+   
+}
