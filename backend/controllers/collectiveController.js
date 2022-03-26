@@ -46,7 +46,7 @@ exports.upload = async (req, res, next) => {
 
         return res.status(200).json({
             success: true,
-            data: result.items
+            imageData: result.items[0]
         })
     } catch (error) {
         return res.status(500).json({

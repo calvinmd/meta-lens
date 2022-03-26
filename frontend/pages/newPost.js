@@ -4,11 +4,9 @@ import { create } from '../../backend/models/User';
 
 
 const newPost = () => {
-  const [ selectedImage, setSelectedImage ] = useState('');
+  const [ selectedImage, setSelectedImage ] = useState(null);
   const [ imageName, setImageName ] = useState('');
   const [ content, setContent ] = useState('');
-  const [ cid, setCID ] = useState('');
-  const [ postID, setPostID ] = useState('');
 
   const handleChange = event => {
     event.preventDefault();
@@ -19,53 +17,46 @@ const newPost = () => {
   const handleSubmit = async (event) => {
     event.preventDefault(); //important
 
-    if(selectedImage == '') { return; } //implement toast here that says "Content Missing!"
+    if(selectedImage == null) { return; } //implement toast here that says "Content Missing!"
     let formData = new FormData();
     formData.append('file', selectedImage);
     formData.append('imageName', imageName);
     formData.append('postContent', content);
 
-    const submitResponse = await fetch('/api/collective/upload', {
-      method: 'POST',
+    let reqOptions = {
+      method: "POST",
       body: formData,
-    })
-    .then(response => response.json())
-      .then(jsondata => console.log(jsondata))
-      .catch(function (error) {
-          console.log(error)
-    })
-    const response = await submitResponse.json();
-    
-    setCID(response.data[0].cid);
-    setPostID(response.data[0].id);
+      redirect: 'follow'
+    }
 
-    createPost();
-    
+    fetch('/api/collective/upload', reqOptions)
+    .then(response => response.text())
+    .then(function (data) {
+      let imageInfo = JSON.parse(data);
+
+      let config = {
+        "postID": imageInfo.imageData.id,
+        "postCID": imageInfo.imageData.cid,
+        "postContent": content,
+        "userID": '2'
+      }
+
+      let requestObj = {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(config)
+      }
+
+      return fetch('/api/post', requestObj);
+    }).then(response => response.json())  
+    .then(function(postData) {
+      console.log("post:", postData) //add toast here that says Post Added! Take the user back to this list of posts 
+    })
+    .catch(error => console.log('error', error));
   }
-
-  // const createPost = async () => { //TODO
-  //   let config = {
-  //     "postID": CID,
-  //     "postCID": postID,
-  //     "postContent": content,
-  //     "userID": '2'
-  //   }
-
-  //   const post = fetch('/api/post', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Accept': 'application/json',
-  //       'Content-Type': 'application/json'
-  //     },
-  //     form: JSON.stringify(config)
-  //   })
-  //   .then(response => response.json())
-  //   .then(jsondata => console.log(jsondata))
-  //   .catch(function (error) {
-  //       console.log(error)
-  //   })
-    
-  // }
 
   return (
     <div className = {postStyles.card}>
