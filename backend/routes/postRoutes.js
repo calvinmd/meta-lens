@@ -7,4 +7,8 @@ postRouter
     .get(postController.getPosts)
     .post(postController.createPost)
 
+postRouter
+    .route('/findPostByUser')
+    .post(postController.findPostByUser)
+
 module.exports = postRouter;

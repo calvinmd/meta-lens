@@ -41,6 +41,22 @@ exports.addUser = async (req, res, next) => {
     }
 }
 
+exports.getUserByID = async (req, res, next) => {
+    try {
+        const { userWallet } = req.body;
+        const userData = await User.find(req.body).exec();
+        return res.status(201).json({
+            success: true,
+            data: userData
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
 exports.deleteUser = async (req, res, next) => {
     try {
       const user = await User.findById(req.params.id);

@@ -13,4 +13,8 @@ userRouter
     .route('/:id')
     .delete(userController.deleteUser);
 
+userRouter  
+    .route('/getUserByID')
+    .post(userController.getUserByID);
+
 module.exports = userRouter;

@@ -19,7 +19,6 @@ exports.getPosts = async (req, res, next) => {
 
 exports.createPost = async (req, res, next) => {
     try {
-        console.log(req.body)
         const { postID, postCID, postContent, userID } = req.body;
         const newPost = await Post.create(req.body);
         return res.status(201).json({
@@ -40,5 +39,21 @@ exports.createPost = async (req, res, next) => {
                 error: 'Server Error'
             })
         }
+    }
+}
+
+exports.findPostByUser = async (req, res, next) => {
+    try {
+        const { userID } = req.body;
+        const postData = await Post.find(req.body).exec();
+        return res.status(201).json({
+            success: true,
+            data: postData
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
     }
 }

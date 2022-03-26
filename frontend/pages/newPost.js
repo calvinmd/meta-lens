@@ -1,6 +1,5 @@
 import postStyles from '../styles/NewPost.module.css'
 import { useState } from 'react';
-import { create } from '../../backend/models/User';
 
 
 const newPost = () => {
@@ -38,7 +37,7 @@ const newPost = () => {
         "postID": imageInfo.imageData.id,
         "postCID": imageInfo.imageData.cid,
         "postContent": content,
-        "userID": '2'
+        "userID": '2' //this should be the wallet address from global context 
       }
 
       let requestObj = {
