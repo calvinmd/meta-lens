@@ -14,7 +14,8 @@ import factory_abi from '../../ABI/MetaLensFactory.json'
 import { ContractAddressContext } from "../contexts/ContractContext"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import nft_abi from "../../ABI/NFT.json"
+import { ethereum } from "@ceramicnetwork/blockchain-utils-linking"
 
 const endpoint = "https://ceramic-clay.3boxlabs.com"
 
@@ -30,8 +31,10 @@ const signup = () => {
   const [url, setUrl] = useState('')
   const [image, setImage] = useState('')
   const [loaded, setLoaded] = useState(false)
-  const [chainID, setChainID] = useState('')
+  let cAdd = ''
   const [symbol, setSymbol] = useState('')
+  const [ceraId, setCeraId] = useState('')
+  let ceramicId = ''
 
 
   function handleContract(e) {
@@ -46,7 +49,6 @@ const signup = () => {
     e.preventDefault()
     await updateProfile()
     const signer = provider.getSigner()
-    console.log(signer, factory_abi, provider)
     const contract_instance = new ethers.Contract("0x25d3460AB6dE030f30aA6Ddce76c52A29B283a44", factory_abi, signer)
     console.log(contract_instance)
     try {
@@ -55,6 +57,7 @@ const signup = () => {
       console.log(receipt.events[0].args[0])
       let conAdd = receipt.events[0].args[0]
       setCAddress(conAdd)
+      cAdd = conAdd
       toast.success(`Your Contract Address - ${conAdd}`, {
         position: "bottom-center",
         autoClose: 5000,
@@ -65,6 +68,11 @@ const signup = () => {
         progress: undefined,
       });
 
+      const nft_instance = new ethers.Contract(conAdd, nft_abi, signer)
+      console.log(nft_instance)
+      const tx_nft = await nft_instance.safeMint(add)
+      const result_nft = await tx_nft.wait()
+      console.log(result_nft)
     }
     catch (error) {
       console.log(error)
@@ -79,31 +87,54 @@ const signup = () => {
       });
     }
 
-
-
+    await setServer()
 
   }
 
+  async function setServer() {
+    console.log(name, cAdd)
+    let config = {
+      "userCeramicId": ceramicId,
+      "userWallet": add,
+      "userNftContractAddress": cAdd,
+      "username": name,
+      "userHandle": `@${name}`
 
-
-  async function readProfile(e) {
-    e.preventDefault()
-    const ceramic = new CeramicClient(endpoint)
-    const idx = new IDX({ ceramic })
-
-    try {
-      const data = await idx.get(
-        'basicProfile',
-        `${add}@eip155:80001`
-      )
-      console.log('data: ', data)
-      if (data.name) setName(data.name)
-      console.log("Read profile")
-    } catch (error) {
-      console.log('error: ', error)
-      setLoaded(true)
     }
+
+    let requestObj = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(config)
+    }
+
+
+
+    fetch('/api/user', requestObj).then(response => response.json()).then(console.log)
   }
+
+
+  // async function readProfile(e) {
+  //   e.preventDefault()
+  //   const ceramic = new CeramicClient(endpoint)
+  //   const idx = new IDX({ ceramic })
+
+  //   try {
+  //     const data = await idx.get(
+  //       'basicProfile',
+  //       `${add}@eip155:80001`
+  //     )
+  //     console.log('data: ', data)
+  //     if (data.name) setName(data.name)
+  //     console.log("Read profile")
+  //   } catch (error) {
+  //     console.log('error: ', error)
+  //     setLoaded(true)
+  //   }
+  // }
 
   async function updateProfile() {
     console.log(name, add)
@@ -122,7 +153,21 @@ const signup = () => {
     })
 
     ceramic.setDID(did)
+    console.log(did)
     await ceramic.did.authenticate()
+    setCeraId(did._id)
+
+    ceramicId = did._id
+    console.log(did._id)
+    toast.success(`Your Digital Identity is - ${ceramicId}`, {
+      position: "bottom-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+    });
 
     const idx = new IDX({ ceramic })
 

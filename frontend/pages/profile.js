@@ -14,54 +14,78 @@ import factory_abi from '../../ABI/MetaLensFactory.json'
 import { ContractAddressContext } from "../contexts/ContractContext"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import postStyles from '../styles/NewPost.module.css'
+
 
 function profile() {
+    const { getAddress } = useContext(AddressContext)
+    const address = getAddress()
     const endpoint = "https://ceramic-clay.3boxlabs.com"
+    let userData = ''
 
     const ceramic = new CeramicClient(endpoint)
     const idx = new IDX({ ceramic })
     const [profileData, setProfileData] = useState('')
+    const [ceramicID, setCeramicID] = useState('')
 
-    try {
-        idx.get(
-            'basicProfile',
-            `0xD59fcF0EaC5946b8a1fB12e6F83eAC74F2688bc2@eip155:80001`
-        ).then(function (data) {
-            console.log(data)
-            setProfileData(data)
+    async function getProfileDetails() {
 
-        })
+        console.log(address)
+        try {
+            idx.get(
+                'basicProfile',
+                `${address}@eip155:80001`
+            ).then(function (data) {
+                console.log(data)
+                setProfileData(data)
+
+            })
 
 
-    } catch (error) {
-        console.log('error: ', error)
+        } catch (error) {
+            console.log('error: ', error)
+        }
     }
 
-    // async function readProfile(e) {
-    //     e.preventDefault()
-    //     const endpoint = "https://ceramic-clay.3boxlabs.com"
+    useEffect(async () => {
+        try {
+            await getProfileDetails()
+            let config = {
+                "userWallet": address
+            }
 
-    //     const ceramic = new CeramicClient(endpoint)
-    //     const idx = new IDX({ ceramic })
+            let requestObj = {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(config)
+            }
 
-    //     try {
-    //         const data = await idx.get(
-    //             'basicProfile',
-    //             `0xD59fcF0EaC5946b8a1fB12e6F83eAC74F2688bc2@eip155:80001`
-    //         )
-    //         console.log('data: ', data)
-    //         if (data.name) setName(data.name)
-    //         console.log("Read profile")
-    //     } catch (error) {
-    //         console.log('error: ', error)
-    //     }
-    // }
+            fetch('/api/user/getUserByID', requestObj).then(response => response.json()).then(function (data) {
+                userData = data.data[0]
+                setCeramicID(userData.userCeramicId)
+
+
+                console.log(data.data[0])
+            })
+        }
+        catch (error) {
+            console.log(error)
+        }
+
+
+    }, [])
+
 
     return (
         <>
-            <div>
-                <h1>{profileData.name}</h1>
-                <h1>{profileData.url}</h1>
+            <div className={postStyles.card} style={{ height: "220px", width: "1000px" }}>
+                <h3>Wallet Address - {address}</h3>
+                <h3>Name - {profileData.name}</h3>
+                <h3>URL - {profileData.url}</h3>
+                <h3>Ceramic ID - {ceramicID}</h3>
             </div>
             <h1></h1></>
 
