@@ -10,6 +10,7 @@ import contract_abi from '../../../ABI/MetaLensFollow.json'
 import nft_abi from '../../../ABI/NFT.json'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios'
 
 export default function user1() {
     // const { getProvider } = useContext(ProviderContext)
@@ -24,6 +25,9 @@ export default function user1() {
     const [cid, setcid] = useState([])
     const [postD, setPostD] = useState('')
     const [len, setLen] = useState(0)
+    const CID = []
+    const token = []
+    const [image, setimage] = useState([])
 
 
     const tokenAccess = ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbmRleGVzIjpbIjExMWJhNzgzNTU0NTVkYTBiMjI1MWJjMmJiNzM2ODdhIl0sImFjY291bnRJZCI6IjdmMjczMmRmLWIzYzAtNGI3YS1iOTc3LTJhYzU5NDFlNjlmYiIsImlhdCI6MTY0ODM4NDc0MiwiZXhwIjoxNjQ4Mzg4MzQyfQ.jsenNEw3C1a8HUVHYBswJHPJssesN1RSOPFYmkcZabA", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbmRleGVzIjpbIjQwMjg1YjFiYWM2YzA4ODkwMWI0Njc3YzU4MzUzMjlkIl0sImFjY291bnRJZCI6IjdmMjczMmRmLWIzYzAtNGI3YS1iOTc3LTJhYzU5NDFlNjlmYiIsImlhdCI6MTY0ODM4NDc2NiwiZXhwIjoxNjQ4Mzg4MzY2fQ.HTngH3VYgDbRi5wx1sqi2dSB810sxDArIJ2aXwtUd44", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbmRleGVzIjpbIjZkYmE1MDQ0MmQ3ZjU2OGIyNDllMTNhZTcxNTYwNTkzIl0sImFjY291bnRJZCI6IjdmMjczMmRmLWIzYzAtNGI3YS1iOTc3LTJhYzU5NDFlNjlmYiIsImlhdCI6MTY0ODM4NDc4NiwiZXhwIjoxNjQ4Mzg4Mzg2fQ.kvMArL1x-C33HYgnlCP8ofFdh5MXxHrmfXmkGE3I5Uc", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbmRleGVzIjpbImRjNjg2YzY5MjRkYmQ0NDY5NGI0NDJmN2FjN2VmOGFmIl0sImFjY291bnRJZCI6IjdmMjczMmRmLWIzYzAtNGI3YS1iOTc3LTJhYzU5NDFlNjlmYiIsImlhdCI6MTY0ODM4MjgwNywiZXhwIjoxNjQ4Mzg2NDA3fQ.Pb8-3_IVs_mP_h-DEaU2gEy3noc0fU8y2c-F5K-7Hes"]
@@ -72,12 +76,19 @@ export default function user1() {
 
             //cid.push(postData[i].postCID)
             // postContent.push(postData[i].postContent)
-            setcontent(oldcontent => [...oldcontent, postData[i].postContent])
+            await setcontent(oldcontent => [...oldcontent, postData[i].postContent])
             if (tx._hex !== "0x00") {
-                setcid(oldcid => [...oldcid, postData[i].postCID])
+                await setcid(oldcid => [...oldcid, postData[i].postCID])
+                CID.push(postData[i].postCID)
+                let result = await accessToken(i)
+                setimage(prevResult => [...prevResult, result])
+            }
+            else {
+                let dummy = 'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/12/31/ff/6a/locked-escape-room-herning.jpg?w=800&h=-1&s=1'
+                setimage(prevResult => [...prevResult, dummy])
             }
         }
-        console.log(cid, content)
+
 
 
 
@@ -87,7 +98,45 @@ export default function user1() {
     }, [])
 
 
-    async function loadContent() {
+    async function accessToken(j) {
+
+        const urlV2API = `https://managed.mypinata.cloud/api/v1`;
+        const API_KEY = "7pOx7VnDHTWqQIOv70vd5xAAlJqWqWXr";
+        const GATEWAY_URL = "metadeso.mypinata.cloud";
+
+
+        const config = {
+            headers: {
+                "x-api-key": `${API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        }
+        try {
+            const con = await axios.get(`${urlV2API}/content`, config);
+            console.log(con)
+
+            const { data } = con;
+            console.log(data)
+            const { items } = data;
+            console.log(items)
+
+            const item = items.find(i => i.cid === CID[j]);
+            console.log(item)
+            const body = {
+                timeoutSeconds: 3600,
+                contentIds: [item.id]
+            }
+            console.log(body)
+            const token = await axios.post(`${urlV2API}/auth/content/jwt`, body, config);
+            console.log(token)
+            return (`https://${GATEWAY_URL}/ipfs/${CID[j]}?accessToken=${token.data}`);
+
+
+        } catch (error) {
+            console.log(error);
+            return error
+        }
+
 
 
 
@@ -122,6 +171,9 @@ export default function user1() {
     let con = Array.from({ length: 6 }, () => Math.floor(Math.random() * 39));
 
     async function handleFollow(e) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        let add = await provider.send("eth_requestAccounts", []);
+        const address = add[0]
         e.preventDefault()
         console.log(provider, contract_abi, address)
 
@@ -176,15 +228,15 @@ export default function user1() {
             <div className={userStyles.card} style={{ border: 'none', height: '50px', width: "600px" }}></div>
 
 
-            {/* <section>
+            <section>
                 {Array.from({ length: len }, (_, i) =>
                     <div className={userStyles.card}>
-                        <h1>Description - {content[i]}</h1>
-                        <img height="400px" style={{ objectFit: 'cover', marginLeft: "10px", marginLeft: '350px' }} width="400px" src={`https://metadeso.mypinata.cloud/ipfs/${cid[i]}?accessToken=${tokenAccess}`} />
+                        <h1>{content[i]}</h1>
+                        <img height="400px" style={{ objectFit: 'cover', marginLeft: "10px", marginLeft: '350px' }} width="400px" src={image[i]} />
                     </div>
                 )}
-            </section> */}
-            <div className={userStyles.card}>
+            </section>
+            {/* <div className={userStyles.card}>
                 <h1>{content[0]}</h1>
                 <img height="400px" style={{ objectFit: 'cover', marginLeft: "10px", marginLeft: '350px' }} width="400px" src={`https://metadeso.mypinata.cloud/ipfs/${cid[0]}?accessToken=${tokenAccess[0]}`} />
             </div>
@@ -199,7 +251,7 @@ export default function user1() {
             <div className={userStyles.card}>
                 <h1> {content[3]}</h1>
                 <img height="400px" style={{ objectFit: 'cover', marginLeft: "10px", marginLeft: '350px' }} width="400px" src={`https://metadeso.mypinata.cloud/ipfs/${cid[3]}?accessToken=${tokenAccess[3]}`} />
-            </div>
+            </div> */}
             <div className={footerStyles.footer}>
                 <button onClick={handleFollow} style={{ size: "50px", fontWeight: "bolder", fontSize: "20px", justifyContent: "flex-start", cursor: "pointer" }}>Follow</button>
                 {/* <button onClick={handleNewPost} style={{ size: "50px", fontWeight: "bolder", fontSize: "20px", justifyContent: "flex-end" }}>New Post</button> */}
